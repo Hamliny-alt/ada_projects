@@ -1,10 +1,4 @@
-{"time": "2026-10-02 23:29:50", "event": "--- NY KLUSTERSESSION STARTAD (PYTHON-TOLK) ---"}
-{"time": "2026-10-02 23:29:59", "event": "Val 3 (Krypto) - V\u00e4rde: 7 | Hash: 217"}
-{"time": "2026-10-02 23:29:59", "event": "GOSSIP SYNC -> Aktoer: Termux-Local-Node | Handling: KRYPTO_HASH | Hash: 217"}
-{"time": "2026-10-02 23:30:11", "event": "--- KLUSTERSESSION AVSLUTAD ---"}
-{"time": "2026-10-02 23:36:51", "event": "--- NY KLUSTERSESSION STARTAD (ALLT-I-ETT) ---"}
-{"time": "2026-10-02 23:37:01", "event": "Val 3 (Krypto) - V\u00e4rde: 77 | Hash: 2387"}
-{"time": "2026-10-02 23:37:01", "event": "GOSSIP SYNC -> Akt\u00f6r: Termux-Local-Node | Handling: KRYPTO_HASH | Hash: 2387"}
-{"time": "2026-10-02 23:37:05", "event": "--- KLUSTERSESSION AVSLUTAD ---"}
-{"time": "2026-10-02 23:41:48", "event": "--- \u00c6GIS SYSTEM STARTAD (MASTER) ---"}
-{"time": "2026-10-02 23:43:25", "event": "--- SYSTEM AVSLUTAT ---"}
+{"time": "2026-10-03 01:37:00", "event": "SYSTEM INITIALIZED: STEADY STATE", "prev_sig": "GENESIS_STATE", "sig": "fbd814fda6921b1e2169a3a9800727565e864db191a521466cabbd87c1950b7c"}
+{"iotatime": 1.618, "event": "IOTATIME_TICK: [Phi-Phase: 1.618]", "prev_sig": "fbd814fda6921b1e2169a3a9800727565e864db191a521466cabbd87c1950b7c", "sig": "e2fb45e0c138668c465fda2f4603b99d05600e7785ae885e0c4d120e17b82375"}
+{"iotatime": 3.2361, "event": "IOTATIME_TICK: [Phi-Phase: 3.2361]", "prev_sig": "e2fb45e0c138668c465fda2f4603b99d05600e7785ae885e0c4d120e17b82375", "sig": "4495d665c03e1fe3deac68e8b7ce441790f25408cdc2b92a8565868c61288318"}
+{"iotatime": 4.8541, "event": "IOTATIME_TICK: [Phi-Phase: 4.8541]", "prev_sig": "4495d665c03e1fe3deac68e8b7ce441790f25408cdc2b92a8565868c61288318", "sig": "6b53df45182edb9444da6752bab671385088efcb2d4086b0f40dd61723a7e76d"}
