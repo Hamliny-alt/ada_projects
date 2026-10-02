@@ -4,6 +4,10 @@ project Projekt is
    for Main use ("main.adb");
 
    package Compiler is
-      for Default_Switches ("Ada") use ("-g", "-O2", "-gnatwa");
+      for Default_Switches ("Ada") use ("-g", "-O2", "-gnatwa", "-gnatwe", "-gnatyyM");
    end Compiler;
+
+   package Prove is
+      for Prove_Switches use ("--level=1", "--prover=z3,cvc4");
+   end Prove;
 end Projekt;
