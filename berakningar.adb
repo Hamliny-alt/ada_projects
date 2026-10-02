@@ -1,9 +1,8 @@
 package body Berakningar is
 
    function Utfor_Berakning (X : Integer) return Integer is
-      Res : Integer;
+      Res : Integer := X * X;
    begin
-      Res := X * X;
       if Res > 100000 then
          Res := 100000;
       end if;

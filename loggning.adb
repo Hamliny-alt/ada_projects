@@ -5,14 +5,15 @@ package body Loggning is
    procedure Skriv_Logg (Meddelande : String) is
       Fil : Ada.Text_IO.File_Type;
    begin
-      Ada.Text_IO.Open (Fil, Ada.Text_IO.Append_File, "aegis.log");
+      begin
+         Ada.Text_IO.Open (Fil, Ada.Text_IO.Append_File, "aegis.log");
+      exception
+         when Ada.Text_IO.Name_Error =>
+            Ada.Text_IO.Create (Fil, Ada.Text_IO.Out_File, "aegis.log");
+      end;
+
       Ada.Text_IO.Put_Line (Fil, Meddelande);
       Ada.Text_IO.Close (Fil);
-   exception
-      when Ada.Text_IO.Name_Error =>
-         Ada.Text_IO.Create (Fil, Ada.Text_IO.Out_File, "aegis.log");
-         Ada.Text_IO.Put_Line (Fil, Meddelande);
-         Ada.Text_IO.Close (Fil);
    end Skriv_Logg;
 
    procedure Las_Och_Analysera_Logg is
