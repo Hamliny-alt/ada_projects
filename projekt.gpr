@@ -1,0 +1,9 @@
+project Projekt is
+   for Source_Dirs use (".");
+   for Object_Dir use "obj";
+   for Main use ("main.adb");
+
+   package Compiler is
+      for Default_Switches ("Ada") use ("-g", "-O2");
+   end Compiler;
+end Projekt;
