@@ -1,6 +1,8 @@
 import sys
 import subprocess
 import os
+import socket
+import time
 
 def fnv1a_32(data: str) -> int:
     Fnv_Offset_Basis = 0x811C9DC5
@@ -12,7 +14,7 @@ def fnv1a_32(data: str) -> int:
     return hash_val
 
 def run_tests():
-    print("[ÆGIS] Startar IPC- och testvektorverifiering mot Ada-kärnan...")
+    print("[ÆGIS] Startar referenstester och Lager 2 socket-integration...")
     
     passed = True
     
@@ -31,62 +33,59 @@ def run_tests():
             print(f"  [FAIL] Python-referens Hash('{data}') -> Förväntade 0x{expected:08X}, fick 0x{result:08X}")
             passed = False
 
-    # 2. IPC-integrationstest mot Ada-binären
-    binary_path = "./obj/main" # Justera efter byggmiljö om nödvändigt
+    # 2. Lager 2 Socket-integrationstest mot Ada-daemonen
+    binary_path = "./obj/main"
     if os.path.exists(binary_path):
-        print("[ÆGIS] Ada-binär hittad. Testar IPC-kommunikation...")
+        print("[ÆGIS] Ada-binär hittad. Startar daemon för Lager 2-test...")
+        daemon_proc = None
         try:
-            # Starta Ada-processen med standard I/O omdirigerad
-            proc = subprocess.Popen(
-                [binary_path],
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                universal_newlines=True
-            )
+            # Starta Ada-daemonen i bakgrunden
+            daemon_proc = subprocess.Popen([binary_path])
+            time.sleep(1) # Ge servern en sekund att binda port 8081
             
-            # Läs välkomstmeddelande
-            welcome = proc.stdout.readline()
-            print(f"  [ADA SERVER]: {welcome.strip()}")
+            # Anslut via TCP-socket (Lager 2)
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect(("127.0.0.1", 8081))
             
-            # Skicka PING-kommando
-            proc.stdin.write("PING\n")
-            proc.stdin.flush()
-            pong_resp = proc.stdout.readline().strip()
-            print(f"  [IPC TEST] Skickade: PING | Svar: {pong_resp}")
+            # Skicka PING
+            s.sendall(b"PING\n")
+            pong_resp = s.recv(1024).decode('utf-8').strip()
+            print(f"  [Lager 2 SOCKET] Skickade: PING | Svar: {pong_resp}")
             if "RES:PONG" in pong_resp:
-                print("  [PASS] IPC PING-test godkänt.")
+                print("  [PASS] Socket PING-test godkänt.")
             else:
-                print("  [FAIL] IPC PING-test misslyckades.")
+                print("  [FAIL] Socket PING-test misslyckades.")
                 passed = False
                 
-            # Skicka HASH-kommando
+            # Skicka HASH
             test_str = "AEGIS_PQC_KERNEL_STATE"
             expected_hash = fnv1a_32(test_str)
-            proc.stdin.write(f"HASH:{test_str}\n")
-            proc.stdin.flush()
-            hash_resp = proc.stdout.readline().strip()
-            print(f"  [IPC TEST] Skickade: HASH:{test_str} | Svar: {hash_resp}")
+            s.sendall(f"HASH:{test_str}\n".encode('utf-8'))
+            hash_resp = s.recv(1024).decode('utf-8').strip()
+            print(f"  [Lager 2 SOCKET] Skickade: HASH:{test_str} | Svar: {hash_resp}")
             
             if f"0x{expected_hash:08X}" in hash_resp.upper():
-                print("  [PASS] IPC HASH-verifikation mot Ada-kärnan godkänd.")
+                print("  [PASS] Socket HASH-verifikation mot Ada-kärnan godkänd.")
             else:
-                print("  [FAIL] Hash-matchning misslyckades mellan Ada och Python.")
+                print("  [FAIL] Hash-matchning via socket misslyckades.")
                 passed = False
                 
-            # Avsluta processen snyggt
-            proc.stdin.write("EXIT\n")
-            proc.stdin.flush()
-            proc.wait(timeout=2)
+            # Stäng av daemonen snyggt
+            s.sendall(b"EXIT\n")
+            s.close()
+            
+            daemon_proc.wait(timeout=2)
             
         except Exception as e:
-            print(f"  [WARN] Fel vid IPC-eksekvering: {e}")
+            print(f"  [WARN] Fel vid Lager 2 socket-eksekvering: {e}")
+            if daemon_proc:
+                daemon_proc.terminate()
             passed = False
     else:
-        print("[ÆGIS] Ingen lokal Ada-binär hittad (hoppar över IPC-test lokalt, körs i CI/CD).")
+        print("[ÆGIS] Ingen lokal Ada-binär hittad (hoppar över Lager 2 socket-test lokalt, körs i CI/CD).")
 
     if passed:
-        print("[ÆGIS] Alla IPC- och referenstester slutförda med godkänt resultat!")
+        print("[ÆGIS] Alla Lager 2- och referenstester slutförda med godkänt resultat!")
         sys.exit(0)
     else:
         sys.exit(1)

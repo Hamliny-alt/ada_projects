@@ -1,43 +1,77 @@
 with Ada.Text_IO;
+with GNAT.Sockets; use GNAT.Sockets;
 with Krypto;
 with Interfaces; use Interfaces;
 
 procedure Main is
-   Line        : String (1 .. 256);
-   Last        : Natural;
+   Server      : Socket_Type;
+   Client      : Socket_Type;
+   Address     : Socket_Add_Type;
+   Channel     : Stream_Access;
    Hash_Result : Unsigned_32;
+   Running     : Boolean := True;
 begin
-   Ada.Text_IO.Put_Line ("[ÆGIS_KERNEL] IPC-server redo. Väntar på kommandon...");
+   Initialize;
+   Create_Socket (Server, Family_Inet, Socket_Stream);
+   Set_Socket_Option (Server, Socket_Level, Reuse_Address_Option, True);
+   
+   Address.Addr := Inet_Addr ("127.0.0.1");
+   Address.Port := 8081;
+   
+   Bind_Socket (Server, Address);
+   Listen_Socket (Server);
+   
+   Ada.Text_IO.Put_Line ("[ÆGIS_DAEMON] Lager 2 aktivt. Lyssnar på 127.0.0.1:8081...");
 
-   while not Ada.Text_IO.End_Of_File loop
-      Ada.Text_IO.Get_Line (Line, Last);
+   while Running loop
+      Accept_Socket (Server, Client, Address);
+      Channel := Stream (Client);
       
-      declare
-         Cmd : constant String := Line (1 .. Last);
+      Ada.Text_IO.Put_Line ("[ÆGIS_DAEMON] Klient ansluten via Lager 2.");
+      
       begin
-         if Cmd'Length >= 4 and then Cmd (Cmd'First .. Cmd'First + 3) = "HASH" then
-            -- Exempel på kommando: HASH:data
-            if Cmd'Length > 5 then
-               declare
-                  Data : constant String := Cmd (Cmd'First + 5 .. Cmd'Last);
-               begin
-                  Hash_Result := Krypto.Generera_Hash (Data);
-                  Ada.Text_IO.Put_Line ("RES:HASH 0x" & Unsigned_32'Image (Hash_Result));
-               end;
-            else
-               Ada.Text_IO.Put_Line ("ERR: MISSING_DATA");
-            end if;
-            
-         elsif Cmd = "PING" then
-            Ada.Text_IO.Put_Line ("RES:PONG");
-            
-         elsif Cmd = "EXIT" then
-            Ada.Text_IO.Put_Line ("RES:SHUTTING_DOWN");
-            exit;
-            
-         else
-            Ada.Text_IO.Put_Line ("ERR: UNKNOWN_COMMAND");
-         end if;
+         while not End_Of_File (Channel.all) loop
+            declare
+               Cmd : constant String := Ada.Text_IO.Get_Line (Channel.all);
+            begin
+               if Cmd'Length >= 4 and then Cmd (Cmd'First .. Cmd'First + 3) = "HASH" then
+                  if Cmd'Length > 5 then
+                     declare
+                        Data : constant String := Cmd (Cmd'First + 5 .. Cmd'Last);
+                     begin
+                        Hash_Result := Krypto.Generera_Hash (Data);
+                        String'Write (Channel, "RES:HASH 0x" & Unsigned_32'Image (Hash_Result) & ASCII.LF);
+                     end;
+                  else
+                     String'Write (Channel, "ERR: MISSING_DATA" & ASCII.LF);
+                  end if;
+                  
+               elsif Cmd = "PING" then
+                  String'Write (Channel, "RES:PONG" & ASCII.LF);
+                  
+               elsif Cmd = "EXIT" then
+                  String'Write (Channel, "RES:SHUTTING_DOWN" & ASCII.LF);
+                  Running := False;
+                  exit;
+                  
+               else
+                  String'Write (Channel, "ERR: UNKNOWN_COMMAND" & ASCII.LF);
+               end if;
+            end;
+         end loop;
+      exception
+         when others =>
+            Ada.Text_IO.Put_Line ("[ÆGIS_DAEMON] Klientanslutning avbruten.");
       end;
+      
+      Close_Socket (Client);
+      
+      if not Running then
+         exit;
+      end if;
    end loop;
+   
+   Close_Socket (Server);
+   Finalize;
+   Ada.Text_IO.Put_Line ("[ÆGIS_DAEMON] Stängd.");
 end Main;
