@@ -12,16 +12,11 @@ jobs:
       - name: Setup Alire (Ada Package Manager)
         uses: alire-project/setup-alire@v3
         with:
-          tag: v2.0.2
-
-      - name: Configure Alire Non-Interactively
-        run: |
-          alire --non-interactive settings --set copilot.auto_conf true || true
-          alire --non-interactive toolchain select --yes gnat_native=14.2.1 gprbuild=22.0.1 || true
+          version: v2.0.2
 
       - name: Build Ada Binary via Alire
         run: |
-          alire --non-interactive run -- gprbuild -P aegis.gpr
+          alr --non-interactive run -- gprbuild -P aegis.gpr
 
       - name: Run Python Test Vectors & Integration
         run: |
@@ -29,4 +24,4 @@ jobs:
           
       - name: Run Formal Verification via Alire
         run: |
-          alire --non-interactive run -- gnatprove -P aegis.gpr --mode=all
+          alr --non-interactive run -- gnatprove -P aegis.gpr --mode=all
