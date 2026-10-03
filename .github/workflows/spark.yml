@@ -12,11 +12,15 @@ jobs:
       - name: Setup Alire (Ada Package Manager)
         uses: alire-project/setup-alire@v3
 
-      - name: Run Python Test Vectors
+      - name: Build Ada Binary via Alire
+        run: |
+          alr --non-interactive toolchain --select
+          alr build
+
+      - name: Run Python Test Vectors & Integration
         run: |
           python3 test_vectors.py
 
       - name: Run Formal Verification via Alire
         run: |
-          alr --non-interactive toolchain --select
           alr exec -- gnatprove -P aegis.gpr --mode=all
