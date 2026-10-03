@@ -9,11 +9,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Ada & GNATprove
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gnat gnatprove
+      - name: Setup Alire (Ada Package Manager)
+        uses: alire-project/setup-alire@v3
 
-      - name: Run Formal Verification
+      - name: Install Toolchain and Verify with GNATprove
         run: |
+          # Konfigurera och hämta gnat/gnatprove automatiskt via Alire
+          alr --non-interactive toolchain --select
+          
+          # Kör formell verifiering på projektet
           gnatprove -P aegis.gpr --mode=all --spark-debug
