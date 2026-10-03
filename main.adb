@@ -32,31 +32,50 @@ begin
       begin
          while not End_Of_File (Channel.all) loop
             declare
-               Cmd : constant String := Ada.Text_IO.Get_Line (Channel.all);
+               Buf : String (1 .. 256);
+               Len : Natural := 0;
+               Ch  : Character;
             begin
-               if Cmd'Length >= 4 and then Cmd (Cmd'First .. Cmd'First + 3) = "HASH" then
-                  if Cmd'Length > 5 then
-                     declare
-                        Data : constant String := Cmd (Cmd'First + 5 .. Cmd'Last);
-                     begin
-                        Hash_Result := Krypto.Generera_Hash (Data);
-                        String'Write (Channel, "RES:HASH 0x" & Unsigned_32'Image (Hash_Result) & ASCII.LF);
-                     end;
-                  else
-                     String'Write (Channel, "ERR: MISSING_DATA" & ASCII.LF);
-                  end if;
-                  
-               elsif Cmd = "PING" then
-                  String'Write (Channel, "RES:PONG" & ASCII.LF);
-                  
-               elsif Cmd = "EXIT" then
-                  String'Write (Channel, "RES:SHUTTING_DOWN" & ASCII.LF);
-                  Running := False;
-                  exit;
-                  
-               else
-                  String'Write (Channel, "ERR: UNKNOWN_COMMAND" & ASCII.LF);
+               -- Läs rad tecken för tecken till ny rad (ASCII.LF)
+               loop
+                  Character'Read (Channel, Ch);
+                  exit when Ch = ASCII.LF or else Len = Buf'Last;
+                  Len := Len + 1;
+                  Buf (Len) := Ch;
+               end loop;
+               
+               -- Rensa bort eventuell CR (stöd för CRLF)
+               if Len > 0 and then Buf (Len) = ASCII.CR then
+                  Len := Len - 1;
                end if;
+               
+               declare
+                  Cmd : constant String := Buf (1 .. Len);
+               begin
+                  if Cmd'Length >= 4 and then Cmd (Cmd'First .. Cmd'First + 3) = "HASH" then
+                     if Cmd'Length > 5 then
+                        declare
+                           Data : constant String := Cmd (Cmd'First + 5 .. Cmd'Last);
+                        begin
+                           Hash_Result := Krypto.Generera_Hash (Data);
+                           String'Write (Channel, "RES:HASH 0x" & Unsigned_32'Image (Hash_Result) & ASCII.LF);
+                        end;
+                     else
+                        String'Write (Channel, "ERR: MISSING_DATA" & ASCII.LF);
+                     end if;
+                     
+                  elsif Cmd = "PING" then
+                     String'Write (Channel, "RES:PONG" & ASCII.LF);
+                     
+                  elsif Cmd = "EXIT" then
+                     String'Write (Channel, "RES:SHUTTING_DOWN" & ASCII.LF);
+                     Running := False;
+                     exit;
+                     
+                  else
+                     String'Write (Channel, "ERR: UNKNOWN_COMMAND" & ASCII.LF);
+                  end if;
+               end;
             end;
          end loop;
       exception
