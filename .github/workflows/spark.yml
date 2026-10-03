@@ -14,7 +14,7 @@ jobs:
 
       - name: Build Ada Binary via Alire
         run: |
-          alr --non-interactive run -- gprbuild -P aegis.gpr
+          alr --non-interactive build
 
       - name: Run Python Test Vectors & Integration
         run: |
@@ -22,4 +22,4 @@ jobs:
           
       - name: Run Formal Verification via Alire
         run: |
-          alr --non-interactive run -- gnatprove -P aegis.gpr --mode=all
+          alr --non-interactive exec -- gnatprove -P aegis.gpr --mode=all
