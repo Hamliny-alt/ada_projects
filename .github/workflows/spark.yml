@@ -11,8 +11,6 @@ jobs:
 
       - name: Setup Alire (Ada Package Manager)
         uses: alire-project/setup-alire@v3
-        with:
-          version: v2.0.2
 
       - name: Build Ada Binary via Alire
         run: |
