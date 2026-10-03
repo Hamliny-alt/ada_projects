@@ -14,8 +14,8 @@ jobs:
 
       - name: Run Formal Verification via Alire
         run: |
-          # Konfigurera verktygskedjan utan extra index-kommandon
+          # Konfigurera projektet icke-interaktivt
           alr --non-interactive toolchain --select
           
-          # Kör formell verifiering
-          gnatprove -P aegis.gpr --mode=all --spark-debug
+          # Kör gnatprove inuti Alires konfigurerade miljö
+          alr exec -- gnatprove -P aegis.gpr --mode=all --spark-debug
