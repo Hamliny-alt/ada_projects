@@ -15,6 +15,11 @@ package body Krypto is
       return Hash_Val;
    end Generera_Hash;
 
+   function Berakna_Checksumma (Data : String) return Unsigned_32 is
+   begin
+      return Generera_Hash (Data);
+   end Berakna_Checksumma;
+
    function Validera_Gitter (Vec : Lattice_Vector) return Boolean is
    begin
       for I in Vec'Range loop
