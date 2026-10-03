@@ -1,0 +1,8 @@
+project Aegis is
+   for Source_Dirs use (".");
+   for Object_Dir use "obj";
+   
+   package Compiler is
+      for Default_Switches ("Ada") use ("-gnatwa", "-gnata");
+   end Compiler;
+end Aegis;
