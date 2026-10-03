@@ -14,9 +14,9 @@ jobs:
 
       - name: Run Formal Verification via Alire
         run: |
-          # Ladda projektets beroenden (inklusive gnatprove) automatiskt
-          alr --non-interactive اقتصادی
-          alr with gnatprove || true
+          # Konfigurera alire icke-interaktivt och uppdatera sessionen
+          alr --non-interactive index --update
+          alr --non-interactive toolchain --select
           
           # Kör formell verifiering
           gnatprove -P aegis.gpr --mode=all --spark-debug
