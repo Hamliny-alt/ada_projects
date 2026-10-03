@@ -4,7 +4,6 @@ version = "0.1.0"
 authors = ["ÆGIS Operator"]
 maintainers = ["ÆGIS Operator"]
 licenses = "MIT"
-pins = {}
 
-[depends-on]
+[[depends-on]]
 gnatprove = "*"
