@@ -1,0 +1,19 @@
+name: ÆGIS SPARK Verification
+
+on: [push, pull_request]
+
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Ada & GNATprove
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnat gnatprove
+
+      - name: Run Formal Verification
+        run: |
+          gnatprove -P aegis.gpr --mode=all --spark-debug
