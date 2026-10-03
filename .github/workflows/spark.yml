@@ -14,7 +14,7 @@ jobs:
 
       - name: Build Ada Binary via Alire
         run: |
-          alr --non-interactive build
+          alr --non-interactive exec -- gprbuild -P aegis.gpr
 
       - name: Run Python Test Vectors & Integration
         run: |
