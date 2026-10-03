@@ -1,29 +1,28 @@
+with Interfaces; use Interfaces;
+with Ada.Characters.Handling;
+
 package body Krypto is
 
-   function FNV1a_Hash (Data : String) return Integer is
-      Fnv_Offset_Basis : constant Integer := 16#811C9DC5#;
-      Fnv_Prime        : constant Integer := 16777619;
-      Hash             : Integer := Fnv_Offset_Basis;
+   function Generera_Hash (Data : String) return Unsigned_32 is
+      Fnv_Offset_Basis : constant Unsigned_32 := 16#811C9DC5#;
+      Fnv_Prime        : constant Unsigned_32 := 16#01000193#;
+      Hash_Val         : Unsigned_32 := Fnv_Offset_Basis;
    begin
       for C of Data loop
-         Hash := Hash xor Character.Pos (C);
-         Hash := Hash * Fnv_Prime;
+         Hash_Val := Hash_Val xor Unsigned_32 (Character'Pos (C));
+         Hash_Val := Hash_Val * Fnv_Prime;
       end loop;
-      return Hash;
-   end Fnv1a_Hash;
+      return Hash_Val;
+   end Generera_Hash;
 
-   function Validate_Lattice_State 
-     (Vec : Lattice_Vector) return Boolean is
-      Valid : Boolean := True;
+   function Validera_Gitter (Vec : Lattice_Vector) return Boolean is
    begin
       for I in Vec'Range loop
-         if Vec (I) < 0 or else Vec (I) >= Modulus then
-            Valid := False;
+         if Vec (I) < 0 or else Lattice_Element(Vec (I)) >= Lattice_Element(Modulus) then
+            return False;
          end if;
-         pragma Loop_Invariant 
-           (for all J in Vec'First .. I => (Vec (J) >= 0 and Vec (J) < Modulus));
       end loop;
-      return Valid;
-   end Validate_Lattice_State;
+      return True;
+   end Validera_Gitter;
 
 end Krypto;
