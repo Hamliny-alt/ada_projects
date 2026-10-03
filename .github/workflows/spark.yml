@@ -14,8 +14,7 @@ jobs:
 
       - name: Run Formal Verification via Alire
         run: |
-          # Konfigurera alire icke-interaktivt och uppdatera sessionen
-          alr --non-interactive index --update
+          # Konfigurera verktygskedjan utan extra index-kommandon
           alr --non-interactive toolchain --select
           
           # Kör formell verifiering
