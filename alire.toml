@@ -1,0 +1,10 @@
+name = "aegis"
+description = "ÆGIS PQC Kernel & SPARK Verification"
+version = "0.1.0"
+authors = ["ÆGIS Operator"]
+maintainers = ["ÆGIS Operator"]
+licenses = "MIT"
+pins = {}
+
+[depends-on]
+gnatprove = "*"

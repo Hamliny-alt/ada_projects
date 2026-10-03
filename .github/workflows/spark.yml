@@ -12,10 +12,11 @@ jobs:
       - name: Setup Alire (Ada Package Manager)
         uses: alire-project/setup-alire@v3
 
-      - name: Configure Toolchain and Verify with GNATprove
+      - name: Run Formal Verification via Alire
         run: |
-          # Tvinga Alire att ladda både kompileraren och gnatprove i sessionen
-          alr --non-interactive toolchain --select gnat_native=14.2.1 gnatprove
+          # Ladda projektets beroenden (inklusive gnatprove) automatiskt
+          alr --non-interactive اقتصادی
+          alr with gnatprove || true
           
           # Kör formell verifiering
           gnatprove -P aegis.gpr --mode=all --spark-debug
