@@ -1,4 +1,4 @@
-name: ÆGIS SPARK Verification
+name: ÆGIS SPARK Verification & Test Vectors
 
 on: [push, pull_request]
 
@@ -11,6 +11,10 @@ jobs:
 
       - name: Setup Alire (Ada Package Manager)
         uses: alire-project/setup-alire@v3
+
+      - name: Run Python Test Vectors
+        run: |
+          python3 test_vectors.py
 
       - name: Run Formal Verification via Alire
         run: |
