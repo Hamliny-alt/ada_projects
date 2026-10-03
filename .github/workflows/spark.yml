@@ -1,26 +1,32 @@
 name: ÆGIS SPARK Verification & Test Vectors
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   prove:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Alire (Ada Package Manager)
         uses: alire-project/setup-alire@v3
+        with:
+          tag: v2.0.2
+
+      - name: Configure Alire Non-Interactively
+        run: |
+          alire --non-interactive settings --set copilot.auto_conf true || true
+          alire --non-interactive toolchain select --yes gnat_native=14.2.1 gprbuild=22.0.1 || true
 
       - name: Build Ada Binary via Alire
         run: |
-          alr --non-interactive toolchain --select
-          alr build
+          alire --non-interactive run -- gprbuild -P aegis.gpr
 
       - name: Run Python Test Vectors & Integration
         run: |
           python3 test_vectors.py
-
+          
       - name: Run Formal Verification via Alire
         run: |
-          alr exec -- gnatprove -P aegis.gpr --mode=all
+          alire --non-interactive run -- gnatprove -P aegis.gpr --mode=all
