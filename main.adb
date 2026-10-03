@@ -6,14 +6,13 @@ with Interfaces; use Interfaces;
 procedure Main is
    Server      : Socket_Type;
    Client      : Socket_Type;
-   Address     : Socket_Add_Type;
+   Address     : Sock_Addr_Type;
    Channel     : Stream_Access;
    Hash_Result : Unsigned_32;
    Running     : Boolean := True;
 begin
    Initialize;
    Create_Socket (Server, Family_Inet, Socket_Stream);
-   Set_Socket_Option (Server, Socket_Level, Reuse_Address_Option, True);
    
    Address.Addr := Inet_Addr ("127.0.0.1");
    Address.Port := 8081;
@@ -30,7 +29,7 @@ begin
       Ada.Text_IO.Put_Line ("[ÆGIS_DAEMON] Klient ansluten via Lager 2.");
       
       begin
-         while not End_Of_File (Channel.all) loop
+         loop
             declare
                Buf : String (1 .. 256);
                Len : Natural := 0;
@@ -91,6 +90,5 @@ begin
    end loop;
    
    Close_Socket (Server);
-   Finalize;
    Ada.Text_IO.Put_Line ("[ÆGIS_DAEMON] Stängd.");
 end Main;
